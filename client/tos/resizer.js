@@ -18,14 +18,14 @@ const htmlPresets = {
 				<div class='mnvbtn' id='homem' onclick="document.location.href = '/home'">home</div>
 				<div class='mnvbtn' id='tosm'>tos</div>
 				<div class='mnvbtn' id='requirementsm' onclick="document.location.href = '/requirements'">requirements</div>
-				<div class='mnvbtn' id='newsm' onclick="document.location.href = '/news'">news</div>
+				<div class='mnvbtn' id='newsm' onclick="document.location.href = 'https://mtcscratch.wordpress.com/'">news</div>
 				<div class='mnvbtn' id='loginm' onclick="document.location.href = '/login'">login</div>
 				<div class='mnvbtn' id='signupm' onclick="document.location.href = '/signup'">signup</div>
 				</div>`,
 	"innerStockHeader": `<div class="nvbtn" id="home" onclick="document.location.href = '/home'">home</div>
 				<div class="nvbtn" id="tos">tos</div>
 				<div class="nvbtn" id="requirements" onclick="document.location.href = '/requirements'">requirements</div>
-				<div class="nvbtn" id="news" onclick="document.location.href = '/news'">news</div>
+				<div class="nvbtn" id="news" onclick="document.location.href = 'https://mtcscratch.wordpress.com/'">news</div>
 				<div class="nvbtn" id="login" onclick="document.location.href = '/login'">login</div>
 				<div class="nvbtn" id="signup" onclick="document.location.href = '/signup'">signup</div>`,
 	"imgStockHeader": `<img class='mobileStack' src='assets/mobileStack.svg'></img>`,

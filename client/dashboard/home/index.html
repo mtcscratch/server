@@ -1,0 +1,37 @@
+<html>
+		<head>
+			<title>Home - Dashboard</title>
+			<link rel="shortcut icon" type="image/x-icon" href="mtc.ico" />
+			<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,900" rel="stylesheet">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<script src="resizer.js"></script>
+			<script src="index.js"></script>
+			<link rel="stylesheet" type="text/css" href="style.css" >
+		</head>
+		<body>
+			
+			<div class="bottomHeader">
+				<div class="balance"><span class="bal">0</span> MTC</div>
+
+			</div>
+			<div class="stockHeader">
+				<img src="assets/settingsIcon.svg" class="actionButton" id="settings"  onclick="document.location.href = '/dashboard/settings/'">
+				<img src="assets/homeSelected.svg" id="home">
+				<img src="assets/planeIcon.svg" class="actionButton" id="pay" onclick="document.location.href = '/dashboard/pay/'">
+
+				<img class="userIcon" src="assets/default.png" style="width: 128px; height: 128px; margin-top: 90px; border-radius: 100%; -webkit-background-clip: padding-box;">
+
+				<div class="welcomeMessage">Welcome back <span class="username"></span></div>
+			</div>
+
+			<center>
+			<div class="paymentHistoryContainer"></div>
+
+			</center>
+		<center>
+
+	</center>
+			<div class="wave1"></div>
+		</body>
+		<script src="script.js"></script>
+</html>

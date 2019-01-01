@@ -1,0 +1,38 @@
+<html>
+		<head>
+			<title>Settings - Mattcoin</title>
+			<link rel="shortcut icon" type="image/x-icon" href="mtc.ico" />
+			<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,900" rel="stylesheet">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<script src="resizer.js"></script>
+			<script src="index.js"></script>
+			<link rel="stylesheet" type="text/css" href="style.css" >
+		</head>
+		<body>
+			
+			<div class="stockHeader">
+				<img src="assets/settingsSelected.svg" id="settings">
+				<img src="assets/home.svg" id="home" class="actionButton" onclick="document.location.href = '/dashboard/home/'">
+				<img src="assets/planeIcon.svg" class="actionButton" id="pay"  onclick="document.location.href = '/dashboard/pay/'">
+
+				<img class="userIcon" src="assets/default.png" style="width: 128px; height: 128px; margin-top: 90px; border-radius: 100%; -webkit-background-clip: padding-box;">
+				<div class="welcomeMessage">Welcome back <span class="username"></span></div>
+			</div>
+
+				<div class="payNav">
+				<center>
+				<img class="pnvlogo" src="assets/settingsIcon.svg"></img>
+				</center>
+				<div class="pnvph">Email:</div>
+				<input type="text" class="pnvin" id="email">
+				<div class='pnve' id="error1"></div>
+				<div class="pnvbtn" id="changeBtn">Change</div>
+				<div class="pnvbtn" id="clearPaymentHistoryBtn">Clear payment history</div>
+				<div class="pnvbtn" id="logoutBtn">Logout</div>
+
+			</div>
+
+			<script type="text/javascript" src="script.js"></script>
+			<div class="wave1"></div>
+		</body>
+</html>

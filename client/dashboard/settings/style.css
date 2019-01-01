@@ -1,0 +1,197 @@
+body{
+	background-color: #f1f1f1;
+	margin: auto 0;
+	overflow: auto;
+}
+
+
+.stockHeader{
+	position: fixed;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none; 
+	-ms-user-select: none;
+	user-select: none;
+	top: 0%;
+	background-color: #2b2b2b;
+	width: 100%;
+	height: 250px;
+}
+
+.balance{
+	width: 100%;
+	text-align: center;
+	position: relative;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	color: #ffffff;
+	font-size: 25px;
+	margin-top: 30px;
+
+}
+
+
+.actionButton:hover{
+	filter: brightness(-50%);
+	cursor: pointer;
+}
+
+#settings{
+	position: absolute;
+	left: calc(100% - 70px);
+	top: 30px;
+	margin-left: 10px;
+	width: 30px;
+}
+
+#pay{
+	position: absolute;
+	left: calc(100% - 70px);
+	top: 150px;
+	margin-left: 10px;
+	width: 30px;
+}
+
+
+#home{
+	position: absolute;
+	left: calc(100% - 60px);
+	top: 90px;
+	width: 30px;
+}
+
+
+
+.bal{
+	font-weight: 700;
+}
+
+.userIcon{
+	position: absolute;
+	left: calc(50% - 64px);
+	top: calc(50% - 170px);
+}
+
+.username{
+	font-weight: 900;
+}
+
+.welcomeMessage{
+	width: 100%;
+	margin-top: 200px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	color: #ffffff;
+	text-align: center;
+}
+
+
+.payNav{
+	border-width: 1px;
+	padding-left: 25px;
+	position: absolute;
+	left: calc(50% - 170px);
+	top: 300px;
+	background-color: #2b2b2b;
+	width: 305px;
+	height: 400px;
+}
+
+.pnvlogo{
+	transform: translateX(-10px);
+	margin-top: 20px;
+	width: 50px;
+}
+
+
+
+.pnvin{
+	font-size: 16px;
+	padding-left: 10px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 500;
+	color: #f1f1f1;
+	margin-top: 2px;
+	outline: none;
+	border: none;
+	width: 90%;
+	height: 40px;
+	background-color: #272727;
+}
+
+.pnve{
+	color: #ff2938;
+	font-size: 13px;
+	font-weight: 300;
+	font-family: 'Roboto', sans-serif;
+}
+
+.pnvph{
+	display: flex;
+	margin-top: 20px;
+	font-size: 15px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	color: #f1f1f1;
+}
+
+
+
+.pnvbtn{
+	background-color: #272727;
+	width: 90%;
+	height: 40px;
+	margin-top: 20px;
+	color: #3ea350;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 900;
+	text-align: center;
+	line-height: 40px;
+}
+
+#clearPaymentHistoryBtn{
+	color: #40a0ff;
+}
+
+#logoutBtn{
+	color: #ff2938;
+}
+
+
+.pnvbtn:hover{
+	cursor: pointer;
+	background-color: #222222;
+}
+
+
+.wave1{height: 400px;position: fixed;width: 100%;z-index: -12;left: 0;bottom: 0;}
+
+.wave1 {
+  -webkit-animation: wave-animation1 8.7s infinite linear; /* Safari 4+ */
+  -moz-animation:    wave-animation1 8.7s infinite linear; /* Fx 5+ */
+  -o-animation:      wave-animation1 8.7s infinite linear; /* Opera 12+ */
+  animation:         wave-animation1 8.7s infinite linear; /* IE 10+ */
+}
+
+
+@-webkit-keyframes wave-animation1 {
+  0%   { background-position: 0 0; }
+  100% { background-position: 1601px 0; }
+}
+@-moz-keyframes wave-animation1 {
+  0%   { background-position: 0 0; }
+  100% { background-position: 1601px 0; }
+}
+@-o-keyframes wave-animation1 {
+  0%   { background-position: 0 0; }
+  100% { background-position: 1601px 0; }
+}
+@keyframes wave-animation1 {
+  0%   { background-position: 0 0; }
+  100% {background-position: 1601px 0;}
+}
+
+.wave1 {
+    background: url('assets/wave.svg') 0 0 repeat-x;
+}

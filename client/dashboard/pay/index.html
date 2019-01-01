@@ -1,0 +1,46 @@
+<html>
+		<head>
+			<title>Pay - Dashboard</title>
+			<link rel="shortcut icon" type="image/x-icon" href="mtc.ico" />
+			
+			<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,900" rel="stylesheet">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<script src="resizer.js"></script>
+			<script src="index.js"></script>
+			<link rel="stylesheet" type="text/css" href="style.css" >
+		</head>
+		<body>
+			
+			<div class="stockHeader">
+				<img src="assets/settingsIcon.svg" class="actionButton" id="settings"  onclick="document.location.href = '/dashboard/settings/'">
+				<img src="assets/home.svg" id="home" class="actionButton" onclick="document.location.href = '/dashboard/home/'">
+				<img src="assets/planeSelected.svg" id="pay">
+
+				<img class="userIcon" src="assets/default.png" style="width: 128px; height: 128px; margin-top: 90px; border-radius: 100%; -webkit-background-clip: padding-box;">
+
+				<div class="welcomeMessage">Welcome back <span class="username"></span></div>
+			</div>
+
+				<div class="payNav">
+				<center>
+				<img class="pnvlogo" src="assets/planeIcon.svg"></img>
+				</center>
+				<div class="pnvph">Person to pay:</div>
+				<input type="text" class="pnvin" id="scratchUsername">
+				<div class="pnve" id="error1"></div>
+				<div class="pnvph">Amount (max&nbsp<span id='maxAmount'></span>&nbspmtc):</div>
+				<input type="text" class="pnvin" id="amount">
+				<div class="pnve" id="error2"></div>
+
+				<div class="pnvph">Message (max 200 characters):</div>
+				<input type="text" class="pnvin" id="message">
+				<div class="pnve" id="error3"></div>
+				<div class="pnvbtn" id='paybtn'>Pay</div>
+				<div class="pnve" id="error4"></div>
+
+			</div>
+			<script src="script.js"></script>
+
+			<div class="wave1"></div>
+		</body>
+</html>

@@ -167,6 +167,16 @@ body{
 	background-color: #272727;
 }
 
+.snve{
+	color: #ff2938;
+	font-size: 13px;
+	font-weight: 300;
+	font-family: 'Roboto', sans-serif;
+
+
+
+}
+
 .snvph{
 	display: flex;
 	margin-top: 20px;
