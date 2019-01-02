@@ -23,6 +23,7 @@
     "crypto": "^1.0.1",
     "express": "^4.16.4",
     "express-rate-limit": "^3.3.2",
+    "express-subdomain": "^1.0.5",
     "firebase": "^5.7.2",
     "request": "^2.88.0",
     "scratch-api": "^1.1.8"

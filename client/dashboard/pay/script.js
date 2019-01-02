@@ -43,6 +43,9 @@ document.getElementById("paybtn").addEventListener("click", function(e){
 		document.getElementById('error3').value = ''
 
 		if (document.getElementById('scratchUsername').value.length < 21 && !document.getElementById('scratchUsername').value.includes(' ')){
+				document.getElementById('error4').style.color = '#ffdd55';
+				document.getElementById('error4').innerText = 'Processing payment...'
+
 
 				fetch(`/api/v1/act/pay`, {
 
@@ -69,6 +72,9 @@ document.getElementById("paybtn").addEventListener("click", function(e){
 					if(!('Error' in res)){
 
 							if(res['response']){
+
+								document.getElementById('error4').style.color = '#3ea350';
+
 								document.getElementById('error1').innerText = ''
 								document.getElementById('error2').innerText = ''
 								document.getElementById('error3').innerText = ''

@@ -70,23 +70,29 @@ app.get('/dashboard', (req, res) => {
 	res.redirect(path.join(__dirname, "client/dashboard/index.html"))
 });
 
+
 function verifyIdentity(username, apiKey, callback){
-	load(`accounts/${username}/scratchVerified`, function(verified){
-		
-		if(verified){
+	return new Promise(function(resolve, reject){
 
-			load(`accounts/${username}/apiKey`, function(apiKey2){
-				if(apiKey2 === apiKey){
+			load(`accounts/${username}/scratchVerified`).then( function(verified){
+			
+			if(verified){
 
-					return callback(true)
-				}else{
-					return callback(false)
-				}
-			})
-		}else{
-			return callback(false)
-		}
+				load(`accounts/${username}/apiKey`).then( function(apiKey2){
+					if(apiKey2 === apiKey){
+
+						resolve(true)
+					}else{
+						resolve(false)
+					}
+				})
+			}else{
+
+				resolve(false)
+			}
+		})
 	})
+	
 }
 
 
@@ -107,32 +113,29 @@ function generateAuthCode(username){
 
 app.get('/api/v1/verifyLoginIntegrity/:username/:apiKey', function(req, res){
 
-	load(`accounts/${req.params.username}/scratchVerified`, function(verified){
-		if(verified){
+	verifyIdentity(req.params.username, req.params.apiKey).then(function(bool){
+		if(bool){
 
-			load(`accounts/${req.params.username}/apiKey`, function(apiKey){
+			res.send({'response': true})
 
-				if(apiKey === req.params.apiKey){
-
-					res.send({'response': true})
-				}else{
-					res.send({'Error': 'Login integrity could not be verified'})
-				}
-			})
 		}else{
-			res.send({'Error': 'Login integrity could not be verified'})
 
+			res.send({'Error': 'Login integrity could not be verified'})
 		}
 	})
 
 });
 
 app.post('/api/v1/act/clearPaymentHistory', function(req, res){
-	verifyIdentity(req.body.username, req.body.apiKey, function(bool){
+	verifyIdentity(req.body.username, req.body.apiKey).then( function(bool){
 		if(bool){
 
-			save(`accounts/balanceHistories/${username}/balanceHistoryCount`, 0, function(e){
-				res.send({"apiKey": object.apiKey} )
+			save(`accounts/balanceHistories/${req.body.username}`, {}).then( function(e){
+
+				return save(`accounts/balanceHistories/${req.body.username}/balanceHistoryCount`, 0)
+
+			}).then(function(e){
+				res.send({"response": true} )
 
 			})
 		}else{
@@ -143,10 +146,10 @@ app.post('/api/v1/act/clearPaymentHistory', function(req, res){
 })
 
 app.post('/api/v1/act/changeEmail', function(req, res){
-	verifyIdentity(req.body.username, req.body.apiKey, function(bool){
+	verifyIdentity(req.body.username, req.body.apiKey).then( function(bool){
 		if(bool){
 
-			save(`accounts/${req.body.username}/email`, req.body.email, function(e){
+			save(`accounts/${req.body.username}/email`, req.body.email).then( function(e){
 
 				res.send({'response': true})
 
@@ -159,10 +162,16 @@ app.post('/api/v1/act/changeEmail', function(req, res){
 })
 
 app.post('/api/v1/act/pay', function(req, res){
-	verifyIdentity(req.body.username, req.body.apiKey, function(bool){
+	let bhc1 = null;
+	let bhc2 = null;
+	let balance = null;
+	let transactionCode = crypto.randomBytes(20).toString('hex');
+
+	verifyIdentity(req.body.username, req.body.apiKey).then( function(bool){
+		
 		if(bool){
 
-			load(`accounts/${req.body.username}/balance`, function(balance){
+			load(`accounts/${req.body.username}/balance`).then( function(balance){
 
 				if(!(balance >= req.body.amount)){
 					res.send({'Error': 'Your balance doesnt cover this amount'})
@@ -192,69 +201,71 @@ app.post('/api/v1/act/pay', function(req, res){
 
 					let newBalance = parseFloat(param - param2).toFixed(4);
 					
-					save(`accounts/${req.body.username}/balance`, newBalance.toString(), function(e){
+					return save(`accounts/${req.body.username}/balance`, newBalance.toString())
+
+					.then( function(e){
+
+						return load(`accounts/balanceHistories/${req.body.username}/balanceHistoryCount`);
+					}).then(function(bhc){
+
+						bhc1 = bhc;
+
+
+						let paymentNotification = `-${parseFloat(req.body.amount).toFixed(4).toString()} MTC @${req.body.username} to @${req.body.topay}`
+
+						return save(`accounts/balanceHistories/${req.body.username}/history/${bhc1}`, {'notification':paymentNotification, 'message': req.body.message, 'transactionCode': transactionCode});
+
+					}).then(function(e){
+						return save(`accounts/balanceHistories/${req.body.username}/balanceHistoryCount`, bhc1 + 1)
+					
+					}).then(function(e){
+						return load(`accounts/balanceHistories/${req.body.topay}/balanceHistoryCount`);
+					
+					}).then(function(bhc){
+
+						 bhc2 = bhc;
+
+						return load(`accounts/${req.body.topay}/balance`)
+					}).then(function(balance){
+
+						param = balance;
+						param2 = req.body.amount;
+
+						if(typeof param === 'string' || param instanceof String){
+
+							param = parseFloat(balance)
+						}else if(balance != null){
+
+							param = parseFloat('5.0')
+						}
+						if(typeof param2 === 'string' || param2 instanceof String){
+
+							param2 = parseFloat(req.body.amount)
+						}
+
+						let newBalance = parseFloat(param + param2).toFixed(4);
+
+						return save(`accounts/${req.body.topay}/balance`, newBalance.toString())
+					
+					}).then(function(e){
+
+						let paymentNotification = `+${parseFloat(req.body.amount).toFixed(4).toString()} MTC @${req.body.username} to @${req.body.topay}`
 						
-						load(`accounts/balanceHistories/${req.body.username}/balanceHistoryCount`, function(bhc1){
+						if (bhc2 === null){
+							bhc2 = 0;
+						}
 
-							let transactionCode = crypto.randomBytes(20).toString('hex');
+						return save(`accounts/balanceHistories/${req.body.topay}/history/${bhc2}`, {'notification':paymentNotification, 'message': req.body.message, 'transactionCode': transactionCode})	
+					
+					}).then(function(e){
 
-							let paymentNotification = `-${parseFloat(req.body.amount).toFixed(4).toString()} MTC @${req.body.username} to @${req.body.topay}`
+						return save(`accounts/balanceHistories/${req.body.topay}/balanceHistoryCount`, bhc2 + 1)
 
-							save(`accounts/balanceHistories/${req.body.username}/history/${bhc1}`, {'notification':paymentNotification, 'message': req.body.message, 'transactionCode': transactionCode}, function(e){
-
-								save(`accounts/balanceHistories/${req.body.username}/balanceHistoryCount`, bhc1 + 1, function(e){
-									
-									load(`accounts/balanceHistories/${req.body.topay}/balanceHistoryCount`, function(bhc2){
-
-										load(`accounts/${req.body.topay}/balance`, function(balance2){
-
-											param = balance2;
-											param2 = req.body.amount;
-
-											if(typeof param === 'string' || param instanceof String){
-
-												param = parseFloat(balance2)
-											}else if(balance2 != null){
-
-												param = parseFloat('0.0')
-											}
-											if(typeof param2 === 'string' || param2 instanceof String){
-
-												param2 = parseFloat(req.body.amount)
-											}
-
-											newBalance = parseFloat(param + param2).toFixed(4);
-
-											save(`accounts/${req.body.topay}/balance`, newBalance.toString(), function(e){
-												
-												paymentNotification = `+${parseFloat(req.body.amount).toFixed(4).toString()} MTC @${req.body.username} to @${req.body.topay}`
-
-												let realbhc = bhc2;
-												
-												if (bhc2 === null){
-													realbhc = 0;
-												}
-												save(`accounts/balanceHistories/${req.body.topay}/history/${realbhc}`, {'notification':paymentNotification, 'message': req.body.message, 'transactionCode': transactionCode}, function(e){
-														
-
-													save(`accounts/balanceHistories/${req.body.topay}/balanceHistoryCount`, realbhc + 1, function(e){
-														res.send({'response': true})
-
-													})
-
-
-												})
-											})
-										})
-
-									});
-								})
-							})
-
-							
-
-						});
+					}).then(function(e){
+						
+						res.send({'response': true})
 					})
+						
 				}
 			})
 		}else{
@@ -267,22 +278,19 @@ app.post('/api/v1/act/pay', function(req, res){
 
 app.get('/api/v1/getUserData/:username/:apiKey', function(req, res){
 
-	load(`accounts/${req.params.username}/scratchVerified`, function(verified){
-		if(verified){
+	verifyIdentity(req.params.username, req.params.apiKey).then(function(bool){
 
-			load(`accounts/${req.params.username}/apiKey`, function(apiKey){
-				if(apiKey === req.params.apiKey){
+		if(bool){
 
-					load(`accounts/${req.params.username}/`, function(object){
-						res.send(object)
+			load(`accounts/${req.params.username}/`).then( function(object){
+				res.send(object)
 
 
-					})
-				}else{
-					res.send({'Error': 'Login integrity could not be verified'})
-				}
 			})
+		}else{
+			res.send({'Error': 'Login integrity could not be verified'})
 		}
+
 	})
 
 
@@ -291,20 +299,16 @@ app.get('/api/v1/getUserData/:username/:apiKey', function(req, res){
 
 app.get('/api/v1/getUserHistory/:username/:apiKey', function(req, res){
 
-	load(`accounts/${req.params.username}/scratchVerified`, function(verified){
-		if(verified){
+	verifyIdentity(req.params.username, req.params.apiKey).then(function(bool){
+		if(bool){
 
-			load(`accounts/${req.params.username}/apiKey`, function(apiKey){
-				if(apiKey === req.params.apiKey){
+			load(`accounts/balanceHistories/${req.params.username}/`).then( function(object){
+				res.send(object)
 
-					load(`accounts/balanceHistories/${req.params.username}/`, function(object){
-						res.send(object)
-
-					})
-				}else{
-					res.send({'Error': 'Login integrity could not be verified'})
-				}
 			})
+		}else{
+			res.send({'Error': 'Login integrity could not be verified'})
+
 		}
 	})
 })
@@ -319,7 +323,7 @@ app.get('/api/v1/signupGetCode/:username', function(req, res){
 
 	}
 
-	load(`accounts/${username}/scratchVerified`, function(verified){
+	load(`accounts/${username}/scratchVerified`).then( function(verified){
 	
 		if(verified){
 			res.send({"Error": "Account already created"} )
@@ -340,7 +344,7 @@ app.get('/api/v1/signupGetCode/:username', function(req, res){
 
 app.get('/api/v1/loginGetCode/:username', function(req, res){
 
-	load(`accounts/${req.params.username}/scratchVerified`, function(verified){
+	load(`accounts/${req.params.username}/scratchVerified`).then( function(verified){
 		if(verified){
 			const username = req.params.username;
 
@@ -364,14 +368,14 @@ app.get('/api/v1/loginGetCode/:username', function(req, res){
 app.post('/api/v1/login/', function(req, res){
 	const username = req.body.username;
 
-	load(`accounts/${req.body.username}/scratchVerified`, function(verified){
+	load(`accounts/${req.body.username}/scratchVerified`).then( function(verified){
 		if(verified){
-			getComments('project', '275981545', function(e){
+			getComments('project', '275981545').then( function(e){
 				if(username in e){
 
 					if (e[username][0] == authCodes[username].code){
 
-						load(`accounts/${username}/apiKey`, function(apiKey){
+						load(`accounts/${username}/apiKey`).then( function(apiKey){
 
 							res.send({'username': username, 'apiKey': apiKey})
 						})
@@ -418,53 +422,61 @@ app.post('/api/v1/signup/', function(req, res){
 
 
 	//balance history - transaction name (+5 MTC @user to @user): message
-	let object = {"iconLink":"", "email": email, "apiKey":  crypto.randomBytes(50).toString('hex'), "balance": '0.0', "scratchVerified": true, "emailVerified": false, "strikes": 0, "chargeBacks": 0, "banned": false}
+	let object = {"iconLink":"", "email": email, "apiKey":  crypto.randomBytes(50).toString('hex'), "balance": '5.0', "scratchVerified": true, "emailVerified": false, "strikes": 0, "chargeBacks": 0, "banned": false}
 	
-	getComments('project', '275981545', function(e){
-		if(username in e){
+	getComments('project', '275981545').then(function(e){
+
+			if(username in e){
 
 			if (authCodes[username].code == e[username][0]){
-				getPictureUrl(username, function(imglink){
 
+				getPictureUrl(username).then(function(imglink){
+					
 					object.iconLink = imglink;
-					load(`accounts/${username}/scratchVerified`, function(verified){
-						if (verified){
+					
+					return load(`accounts/${username}/scratchVerified`)
 
-							res.send({"Error": "Account already created"} )
+				}).then(function(verified){
 
-						}else{
-							
-							load(`accounts/${username}/balance`, function(balance){
+					if (verified){
 
-								if(balance === null || balance === undefined){
+						res.send({"Error": "Account already created"} )
+
+					}else{
+						
+						load(`accounts/${username}/balance`).then(function(balance){
+
+							if(balance === null || balance === undefined){
+								
+								save(`accounts/${username}/`, object).then(function(){
 									
-									save(`accounts/${username}/`, object, function(){
-										save(`accounts/balanceHistories/${username}/balanceHistoryCount`, 0, function(e){
-											res.send({"apiKey": object.apiKey} )
+									return save(`accounts/balanceHistories/${username}/balanceHistoryCount`, 0,)
 
-										})
+								}).then(function(state){
 
-									})
-								}else{
-									const oldBalance = balance;
+									res.send({"apiKey": object.apiKey} )
+								})
+							
 
-									load(`accounts/balanceHistories/${username}`, function(balanceHistory){
+							}else{
+								const oldBalance = balance;
 
-										const oldBalanceHistory = balanceHistory;
-										
-										object.balanceHistory = oldBalanceHistory;
-										object.balance = oldBalance;
+								load(`accounts/balanceHistories/${username}`).then(function(balanceHistory){
+									const oldBalanceHistory = balanceHistory;
+									
+									object.balanceHistory = oldBalanceHistory;
+									object.balance = oldBalance;
 
+									return save(`accounts/${username}/`, object)
 
-										save(`accounts/${username}/`, object, function(){
-											res.send({"apiKey":object.apiKey} )
+								}).then(function(state){
 
-										})							
-									});
-								}
-							});
-						}
-					});		
+									res.send({"apiKey":object.apiKey} )
+
+								})	
+							}
+						});
+					}
 				})
 	
 			}else{
@@ -491,7 +503,8 @@ app.post('/api/v1/signup/', function(req, res){
 
 			res.send({'Error': 'commentNotFound', 'newCode': authCodes[username].code})
 		}
-	})
+	})	
+
 });
 
 const config = {
@@ -503,21 +516,28 @@ const config = {
 firebase.initializeApp(config);
 
 function save(path, payload, callback){
+	return new Promise(function(resolve, reject){
 		firebase.database().ref(path).set(payload, function(e){
 			if (e){
-				return callback(false);
+				resolve(false);
 			}else{
-				return callback(true);
+				resolve(true);
 			}
 		});
+	})
+		
 
 }
 
 function load(path, callback){
-	firebase.database().ref(path).once('value').then(function(snapshot) {
-	return callback(snapshot.val())
-	  // ...
-	});
+	return new Promise(function(resolve, reject){
+
+			firebase.database().ref(path).once('value').then(function(snapshot) {
+					resolve(snapshot.val())
+	  				// ...
+			});
+	})
+	
 }
 
 firebase.auth().signInWithEmailAndPassword(process.env.firebasemail, process.env.firebasepassword)
@@ -528,36 +548,41 @@ firebase.auth().signInWithEmailAndPassword(process.env.firebasemail, process.env
 
 
 
-function getComments(type, id, callback){
-	let object = {};
-	request(
-	    { uri: "https://scratch.mit.edu/site-api/comments/project/275981545/" },
-	    
-		    function(error, response, body) {
-		       
-		        const $ = cheerio.load(body)
+function getComments(type, id){
+	return new Promise(function(resolve, reject){
+		let object = {};
+		request(
+			    { uri: "https://scratch.mit.edu/site-api/comments/project/275981545/" },
+			    
+				    function(error, response, body) {
+				       
+				        const $ = cheerio.load(body)
 
-			    $('.name').each(function (i, elem) {
-			    	if (!($(this).first().text().split(`\n`).join(``).split(` `).join(``) in object)){
-			    		object[$(this).first().text().split(`\n`).join(``).split(` `).join(``)] = []
-			    	}
-			    	object[$(this).first().text().split(`\n`).join(``).split(` `).join(``)].push( $(this).next().text().split(`\n`).join(``).split(` `).join(``) )
-			    })
+					    $('.name').each(function (i, elem) {
+					    	if (!($(this).first().text().split(`\n`).join(``).split(` `).join(``) in object)){
+					    		object[$(this).first().text().split(`\n`).join(``).split(` `).join(``)] = []
+					    	}
+					    	object[$(this).first().text().split(`\n`).join(``).split(` `).join(``)].push( $(this).next().text().split(`\n`).join(``).split(` `).join(``) )
+					    })
 
-			    return callback(object)
-			}
-		);
+					    resolve(object)
+					}
+				);
+		})
 }
 
-function getPictureUrl(username, callback){
-let object = {};
-	request(
-	    { uri: `https://api.scratch.mit.edu/users/${username}/` },
-	    
-		    function(error, response, body) {
-		        let data = JSON.parse(body)
+function getPictureUrl(username){
+	return new Promise(function(resolve, reject){
+		let object = {};
+		request(
+		    { uri: `https://api.scratch.mit.edu/users/${username}/` },
+		    
+			    function(error, response, body) {
+			        let data = JSON.parse(body)
 
-		        return callback(`https://cdn2.scratch.mit.edu/get_image/user/${data.id}_256x256.png`);
-			}
-		);
+			        resolve (`https://cdn2.scratch.mit.edu/get_image/user/${data.id}_256x256.png`);
+				}
+			);
+	})
+
 }
