@@ -96,6 +96,8 @@ function verifyIdentity(username, apiKey, callback){
 }
 
 
+
+
 function generateAuthCode(username){
 	const code = Math.random().toString(36).substring(5);
 
@@ -108,6 +110,127 @@ function generateAuthCode(username){
 	return {"code": code, "codeTimeout": codeTimeout}
 
 }
+
+
+//Token reward starts at 50MTC
+//This value gets halfed every 10^(i + 1) blocks and difficulty increased by 64 times
+
+app.get('/api/v1/crypto/config', function(req, res){
+	load('crypto/config').then(function(data){
+		res.send(data)
+
+	})
+
+})
+
+
+app.get('/api/v1/crypto/block/:id', function(req, res){
+	load(`crypto/blocks/${req.params.id}`).then(function(data){
+		res.send(data)
+
+	})
+
+})
+
+app.post('/api/v1/crypto/submission/', function(req, res){
+
+	const value = req.body.value;
+
+	const userToReward = req.body.user;
+
+	let userBalance = null;
+
+	let balanceHistoryCount = null;
+
+	load('crypto/config').then(function(data){
+
+		let configData = data;
+		
+		const blockReward = configData.blockReward;
+		
+		const blockCount = configData.blockCount;
+
+		const currentKey = configData.key;
+
+
+		const hash = crypto.createHash('sha256').update(value).digest('hex');
+
+		if(hash.startsWith(configData.key)){
+			
+			configData.blockCount += 1;
+
+			configData.total += configData.blockReward;
+
+			if((configData.blockCount - configData.blockCountLast) > Math.pow(10, (configData.times + 1))){
+
+				configData.blockReward = configData.blockReward / 2
+				configData.times += 1;
+				configData.blockCountLast = configData.blockCount;
+
+				configData.difficulty += 1;
+			}
+
+			configData.key = crypto.randomBytes(configData.difficulty).toString('hex')
+
+			configData.key = configData.key.substring(0, configData.key.length - configData.key.length / 2);
+
+			save('crypto/config', configData).then(function(state){
+
+				return save(`crypto/blocks/${blockCount}`, {'key': currentKey, 'value': value ,'hash': hash, 'author': userToReward})
+			}).then(function(state){
+
+				return load(`accounts/${userToReward}/scratchVerified`)
+			}).then(function(verified){
+
+				if(verified){
+
+					load(`accounts/${userToReward}/balance`).then(function(balance){
+						userBalance = balance;
+
+						return load(`accounts/balanceHistories/${userToReward}/balanceHistoryCount`)
+					}).then(function(bhc){
+
+						if(bhc === null){
+							balanceHistoryCount = 0;
+						}else{
+							balanceHistoryCount = bhc
+
+						}
+
+						return save(`accounts/${userToReward}/balance`, (parseFloat(blockReward) + parseFloat(userBalance)).toFixed(4))
+					}).then(function(state){
+
+						return save(`accounts/balanceHistories/${userToReward}/history/${balanceHistoryCount}`, 
+								
+								{'notification':`+${blockReward} MTC [ System Block Reward ]`,
+								 'message': `Payment authored by the Mattcoin System to ${userToReward} for mining block ${blockCount}.`,
+								 'transactionCode': crypto.randomBytes(20).toString('hex')
+								}
+							
+							)
+
+					}).then(function(state){
+
+						return save(`accounts/balanceHistories/${userToReward}/balanceHistoryCount`, balanceHistoryCount + 1) 
+					
+					}).then(function(state){
+
+						res.send({'response': true})
+					})
+				}else{
+
+					//Must be a registered user to use the mining system
+					res.send({'response': false})
+				}
+			})
+		}else{
+			res.send({'response': false})
+		}
+
+	})
+
+})
+
 
 //api requests
 
@@ -160,6 +283,8 @@ app.post('/api/v1/act/changeEmail', function(req, res){
 		}
 	})
 })
+
+
 
 app.post('/api/v1/act/pay', function(req, res){
 	let bhc1 = null;
