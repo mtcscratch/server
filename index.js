@@ -206,7 +206,14 @@ app.post('/api/v1/crypto/submission/', function(req, res){
 					
 					}).then(function(state){
 
+						//A little thing for logging blocks
+						
+						return post(process.env.webhook, {'content': `Block ${serverConfig.blockCount - 1} authored by **${userToReward}**`})
+
+					}).then(function(state){
+
 						res.send({'response': true})
+
 					})
 				}else{
 
@@ -668,6 +675,29 @@ firebase.auth().signInWithEmailAndPassword(process.env.firebasemail, process.env
 
 });
 
+function post(url, jsonObject){
+	return new Promise(function(resolve, reject){
+		var options = {
+			
+			uri: url,
+
+			method: 'POST',
+
+			json: jsonObject
+		};
+
+		request(options, function (error, response, body) {
+			
+			if (!error) {
+			
+				resolve(response.body);
+			}else{
+
+				reject(error)
+			}
+		});
+	})
+}
 
 
 function getComments(type, id){
