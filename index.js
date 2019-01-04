@@ -6,7 +6,6 @@ const app = express()
 const { exec } = require('child_process');
 const fs = require("fs")
 const firebase = require("firebase")
-const RateLimit = require('express-rate-limit');
 var request = require("request");
 var crypto = require("crypto");
 
@@ -27,22 +26,6 @@ app.use(express.static(path.join(__dirname, "client")))
 
 app.use("/api/" ,bodyParser.urlencoded({ extended: false }));
 app.use("/api/", bodyParser.json());
-
-var apiLimiter = new RateLimit({
-  windowMs: 10*60*1000, // 15 minutes
-  max: 100,
-  delayMs: 0 // disabled
-});
- 
-var apiLimiter2 = new RateLimit({
-  windowMs: 10*60*1000, // 15 minutes
-  max: 1000,
-  delayMs: 0 // disabled
-});
-
-app.use('/api/v1/', apiLimiter);
-
-app.use('/api/v1/crypto/', apiLimiter2);
 
 
 app.use(function (req, res, next) {
