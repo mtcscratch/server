@@ -34,7 +34,16 @@ var apiLimiter = new RateLimit({
   delayMs: 0 // disabled
 });
  
-app.use('/api/', apiLimiter);
+var apiLimiter2 = new RateLimit({
+  windowMs: 10*60*1000, // 15 minutes
+  max: 1000,
+  delayMs: 0 // disabled
+});
+
+app.use('/api/v1/', apiLimiter);
+
+app.use('/api/v1/crypto/', apiLimiter2);
+
 
 app.use(function (req, res, next) {
 
