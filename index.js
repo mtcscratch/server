@@ -201,9 +201,9 @@ app.post('/api/v1/crypto/submission/', function(req, res){
 
 			}
 
-			configData.key = crypto.randomBytes(configData.difficulty).toString('hex')
+			configData.key = crypto.randomBytes(1).toString('hex')
 
-			configData.key = configData.key.substring(0, configData.key.length - configData.key.length / 2);
+			configData.key = configData.repeat(3)
 
 			save('crypto/config', configData).then(function(state){
 
