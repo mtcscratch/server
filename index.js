@@ -203,7 +203,7 @@ app.post('/api/v1/crypto/submission/', function(req, res){
 
 			configData.key = crypto.randomBytes(1).toString('hex')
 
-			configData.key = configData.repeat(3)
+			configData.key = configData.key.repeat(3)
 
 			save('crypto/config', configData).then(function(state){
 
