@@ -151,9 +151,9 @@ app.post('/api/v1/crypto/submission/', function(req, res){
 
 	let balanceHistoryCount = null;
 
-	load('crypto/config').then(function(data){
+	load('crypto/config').then(function(cfgdata){
 
-		let configData = data;
+		let configData = cfgdata;
 		
 		const blockReward = configData.blockReward;
 		
