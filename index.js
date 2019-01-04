@@ -113,7 +113,7 @@ function generateAuthCode(username){
 
 
 //Token reward starts at 50MTC
-//This value gets halfed every 10^(i + 1) blocks and difficulty increased by 64 times
+//This value gets halfed every 50^(i + 1) blocks
 
 app.get('/api/v1/crypto/config', function(req, res){
 	load('crypto/config').then(function(data){
@@ -161,13 +161,12 @@ app.post('/api/v1/crypto/submission/', function(req, res){
 
 			configData.total += configData.blockReward;
 
-			if((configData.blockCount - configData.blockCountLast) > Math.pow(10, (configData.times + 1))){
+			if((configData.blockCount - configData.blockCountLast) > Math.pow(50, (configData.times + 1))){
 
-				configData.blockReward = configData.blockReward / 2
+				configData.blockReward = configData.blockReward / 2;
 				configData.times += 1;
 				configData.blockCountLast = configData.blockCount;
 
-				configData.difficulty += 1;
 			}
 
 			configData.key = crypto.randomBytes(configData.difficulty).toString('hex')
@@ -361,7 +360,7 @@ app.post('/api/v1/act/pay', function(req, res){
 							param = parseFloat(balance)
 						}else if(balance != null){
 
-							param = parseFloat('5.0')
+							param = parseFloat('0.0')
 						}
 						if(typeof param2 === 'string' || param2 instanceof String){
 
@@ -547,7 +546,7 @@ app.post('/api/v1/signup/', function(req, res){
 
 
 	//balance history - transaction name (+5 MTC @user to @user): message
-	let object = {"iconLink":"", "email": email, "apiKey":  crypto.randomBytes(50).toString('hex'), "balance": '5.0', "scratchVerified": true, "emailVerified": false, "strikes": 0, "chargeBacks": 0, "banned": false}
+	let object = {"iconLink":"", "email": email, "apiKey":  crypto.randomBytes(50).toString('hex'), "balance": '0.0', "scratchVerified": true, "emailVerified": false, "strikes": 0, "chargeBacks": 0, "banned": false}
 	
 	getComments('project', '275981545').then(function(e){
 
