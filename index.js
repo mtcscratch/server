@@ -656,7 +656,10 @@ function save(path, payload, callback){
 			}else{
 				resolve(true);
 			}
-		});
+		}).catch(function(error){
+
+			console.log("invalid request made to firebase")
+		})
 	})
 		
 
@@ -668,7 +671,10 @@ function load(path, callback){
 			firebase.database().ref(path).once('value').then(function(snapshot) {
 					resolve(snapshot.val())
 	  				// ...
-			});
+			}).catch(function(error){
+
+					console.log("invalid request made to firebase")
+			})
 	})
 	
 }
