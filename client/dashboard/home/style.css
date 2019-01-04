@@ -32,6 +32,7 @@ body{
 }
 
 .paymentHeaderNegative{
+	font-size: 13px;
 	font-family: 'Roboto', sans-serif;
 	font-weight: 700;
 	line-height: 50px;
@@ -43,6 +44,7 @@ body{
 }
 
 .paymentHeaderPositive{
+	font-size: 13px;
 	font-family: 'Roboto', sans-serif;
 	font-weight: 700;
 	line-height: 50px;
@@ -132,6 +134,43 @@ body{
 	left: calc(50% - 64px);
 	top: calc(50% - 170px);
 }
+
+.pnvbtn{
+	font-size: 13px;
+	background-color: #272727;
+	width: 100px;
+	height: 40px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-style: normal;
+
+	color: #ffffff;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	text-align: center;
+	line-height: 40px;
+}
+
+.pnvbtn:hover{
+	cursor: pointer;
+	background-color: #222222;
+}
+
+.loadmored{
+	font-size: 13px;
+	background-color: #272727;
+	width: 100px;
+	height: 40px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-style: italic;
+	color: #ffdd55;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	text-align: center;
+	line-height: 40px;
+}
+
 
 .username{
 	font-weight: 900;

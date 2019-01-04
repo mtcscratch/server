@@ -86,6 +86,46 @@ function verifyIdentity(username, apiKey, callback){
 	})
 	
 }
+//8906 - 10*1
+function historyLoad(username, plid){
+	return new Promise(async function(resolve,reject){
+
+		let bhc = await load(`accounts/balanceHistories/${username}/balanceHistoryCount`);
+		
+		let arr = [];
+		
+		let preObj = null;
+		
+		let dippedNegative = false;
+		
+		let lid = plid;
+		
+		let iter = null;
+
+		if(plid == "none"){
+
+			lid = bhc;
+		}
+
+
+		for (iter = (lid - 10);  iter < lid; iter++){
+
+			preObj = await load(`accounts/balanceHistories/${username}/history/${iter}`)
+			
+			if(0 >= iter){
+				dippedNegative = true;
+			}
+
+			if(preObj != null){
+					arr.push(preObj)
+			}
+
+		}
+
+		resolve({"obj": arr.reverse(), "dipped": dippedNegative, lid: (iter - 10)})
+	});
+
+}
 
 
 
@@ -296,7 +336,7 @@ app.post('/api/v1/act/pay', function(req, res){
 
 			load(`accounts/${req.body.username}/balance`).then( function(balance){
 
-				if(!(balance >= req.body.amount)){
+				if(!(parseFloat(balance) >= parseFloat(req.body.amount))){
 					res.send({'Error': 'Your balance doesnt cover this amount'})
 
 				}else if (!(isNumeric(req.body.amount) && req.body.amount > 0)){
@@ -420,12 +460,12 @@ app.get('/api/v1/getUserData/:username/:apiKey', function(req, res){
 })
 
 
-app.get('/api/v1/getUserHistory/:username/:apiKey', function(req, res){
+app.get('/api/v1/getUserHistory/:username/:apiKey/:lid', function(req, res){
 
 	verifyIdentity(req.params.username, req.params.apiKey).then(function(bool){
 		if(bool){
 
-			load(`accounts/balanceHistories/${req.params.username}/`).then( function(object){
+			historyLoad(req.params.username, req.params.lid).then( function(object){
 				res.send(object)
 
 			})
@@ -670,10 +710,7 @@ function load(path, callback){
 }
 
 firebase.auth().signInWithEmailAndPassword(process.env.firebasemail, process.env.firebasepassword)
-.then(function(user){
 
-
-});
 
 function post(url, jsonObject){
 	return new Promise(function(resolve, reject){
