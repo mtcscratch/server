@@ -207,8 +207,8 @@ app.post('/api/v1/crypto/submission/', function(req, res){
 					}).then(function(state){
 
 						//A little thing for logging blocks
-						
-						return post(process.env.webhook, {'content': `Block ${serverConfig.blockCount - 1} authored by **${userToReward}**`})
+
+						return post(process.env.webhook, {'content': `Block ${blockCount} authored by **${userToReward}**`})
 
 					}).then(function(state){
 
