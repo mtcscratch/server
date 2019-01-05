@@ -3,6 +3,7 @@
    "env": {
     "firebasemail": "@firebasemail",
     "firebasepassword": "@firebasepassword",
-    "webhook": "@discordwebhook"
+    "webhook": "@discordwebhook",
+    "masterkey":"@masterkey"	
   }
 }

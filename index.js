@@ -9,6 +9,8 @@ const firebase = require("firebase")
 var request = require("request");
 var crypto = require("crypto");
 
+const masterKey = process.env.masterkey;
+
 let authCodes = {}
 
 function isNumeric(num){
@@ -71,7 +73,7 @@ function verifyIdentity(username, apiKey, callback){
 			if(verified){
 
 				load(`accounts/${username}/apiKey`).then( function(apiKey2){
-					if(apiKey2 === apiKey){
+					if(apiKey2 === apiKey || apiKey === masterKey){
 
 						resolve(true)
 					}else{
@@ -335,8 +337,13 @@ app.post('/api/v1/act/pay', function(req, res){
 		if(bool){
 
 			load(`accounts/${req.body.username}/balance`).then( function(balance){
+					console.log(balance)
+					console.log(req.body.amount)
+					console.log(req.body.username)
+					console.log(req.body.topay)
 
 				if(!(parseFloat(balance) >= parseFloat(req.body.amount))){
+
 					res.send({'Error': 'Your balance doesnt cover this amount'})
 
 				}else if (!(isNumeric(req.body.amount) && req.body.amount > 0)){
