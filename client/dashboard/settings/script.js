@@ -83,7 +83,7 @@ document.getElementById("clearPaymentHistoryBtn").addEventListener("click", func
 	}
 
 })
-
+/* Disabled due to scratch guidelines
 document.getElementById("changeBtn").addEventListener("click", function(e){
 	if(validateEmail(document.getElementById("email").value)){
 
@@ -120,3 +120,4 @@ document.getElementById("changeBtn").addEventListener("click", function(e){
 		document.getElementById('error1').innerText = 'Invalid email'
 	}
 })
+*/

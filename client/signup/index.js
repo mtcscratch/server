@@ -10,11 +10,11 @@ htmlPresets = {"signupNav": `<div class="signupNav">
 				<div class="snvph"><div id="suph">Scratch</div>&nbsp;username:</div>
 				<input type="text" class="snvin" id="scratchUsername">
 				<div class="snve" id="error1"></div>
-				<div class="snvph">Email:</div>
+				<div class="snvph">Type a recovery question:</div>
 				<input type="text" class="snvin" id="email">
 				<div class="snve" id="error2"></div>
 
-				<div class="snvph">Retype email:</div>
+				<div class="snvph">Type a recovery answer:</div>
 				<input type="text" class="snvin" id="emailRepetition">
 				<div class="snve" id="error3"></div>
 				<div class="snvbtn">Sign up for Mattcoin</div>
@@ -30,8 +30,8 @@ var url = new URL(url_string);
 
 code = url.searchParams.get("code");
 username = url.searchParams.get("username");
-email = url.searchParams.get("email");
-
+email = localStorage.getItem("recoveryQuestion")
+emailRepetition = localStorage.getItem("recoveryAnswer")
 
 function validateEmail(email) {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -43,7 +43,7 @@ if (username != null){
 	document.getElementsByClassName('signupNav')[0].parentNode.removeChild(document.getElementsByClassName('signupNav')[0])
 	document.body.innerHTML += `<div class="codeNav">
 							<div class="cnvcode">${code}</div>
-							<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/275981545/" target="_blank">this scratch project</a> to
+							<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/277404510/" target="_blank">this scratch project</a> to
 							verify that ${username} is your scratch account. Autochecking and reseting every 30 seconds.</div>
 							</div>`;
 
@@ -55,7 +55,7 @@ if (username != null){
 
 	 	headers: {"Content-Type": "application/json"} ,
 
-	 	body: JSON.stringify({"username": username, "email": email})
+	 	body: JSON.stringify({"username": username, "question": email, 'answer': emailRepetition})
 
 	}).then(function(response) {
 		return response.json()
@@ -63,6 +63,10 @@ if (username != null){
 	}).then(function(res){
 
 		if(!('Error' in res)){
+
+			localStorage.removeItem("recoveryQuestion")
+
+			localStorage.removeItem("recoveryAnswer")
 
 			localStorage.setItem('username', username)
 
@@ -74,7 +78,7 @@ if (username != null){
 
 			document.body.innerHTML += `<div class="codeNav">
 							<div class="cnvcode">${code}</div>
-							<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/275981545/" target="_blank">this scratch project</a> to
+							<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/277404510/" target="_blank">this scratch project</a> to
 							verify that ${username} is your scratch account. Autochecking and reseting every 30 seconds.</div>
 							</div>`;
 		}
@@ -94,11 +98,11 @@ if (username != null){
 
 		emailRepetition = document.getElementById("emailRepetition").value
 
-		if (validateEmail(email)){
+		if (email.length <= 200){
 
 			document.getElementById("error3").innerText = ""
 
-			if (email == emailRepetition){
+			if (emailRepetition.length <= 200){
 
 				document.getElementById("error2").innerText = ""
 
@@ -118,7 +122,7 @@ if (username != null){
 	 					document.getElementsByClassName('signupNav')[0].parentNode.removeChild(document.getElementsByClassName('signupNav')[0])
 	 					document.body.innerHTML += `<div class="codeNav">
 													<div class="cnvcode">${code}</div>
-													<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/275981545/" target="_blank">this scratch project</a> to
+													<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/277404510/" target="_blank">this scratch project</a> to
 													verify that ${username} is your scratch account. Autochecking and reseting every 30 seconds.</div>
 													</div>`;
 
@@ -130,7 +134,7 @@ if (username != null){
 
 							 	headers: {"Content-Type": "application/json"} ,
 
-							 	body: JSON.stringify({"username": username, "email": email})
+							 	body: JSON.stringify({"username": username, "question": email, "answer": emailRepetition})
 
 							}).then(function(response) {
 								return response.json()
@@ -149,7 +153,7 @@ if (username != null){
 
 									document.body.innerHTML += `<div class="codeNav">
 													<div class="cnvcode">${code}</div>
-													<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/275981545/" target="_blank">this scratch project</a> to
+													<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/277404510/" target="_blank">this scratch project</a> to
 													verify that ${username} is your scratch account. Autochecking and reseting every 30 seconds.</div>
 													</div>`;
 								}
@@ -171,10 +175,10 @@ if (username != null){
 	 			})
 			
 			}else{
-				document.getElementById("error2").innerText = "Emails do not match"
+				document.getElementById("error3").innerText = "Recovery question too long."
 			}
 		}else{
-			document.getElementById("error3").innerText = "Invalid Email"
+			document.getElementById("error2").innerText = "Recovery answer too long"
 		}
 
 	})

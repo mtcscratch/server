@@ -308,6 +308,7 @@ app.post('/api/v1/act/clearPaymentHistory', function(req, res){
 	})
 })
 
+/* Out of service do to scratch guidelines
 app.post('/api/v1/act/changeEmail', function(req, res){
 	verifyIdentity(req.body.username, req.body.apiKey).then( function(bool){
 		if(bool){
@@ -323,7 +324,7 @@ app.post('/api/v1/act/changeEmail', function(req, res){
 		}
 	})
 })
-
+*/
 
 
 app.post('/api/v1/act/pay', function(req, res){
@@ -588,11 +589,12 @@ app.post('/api/v1/login/', function(req, res){
 
 app.post('/api/v1/signup/', function(req, res){
 	const username = req.body.username;
-	const email = req.body.email;
+	const securityQuestion = req.body.question;
+	const securityAnswer = req.body.answer;
 
 
 	//balance history - transaction name (+5 MTC @user to @user): message
-	let object = {"iconLink":"", "email": email, "apiKey":  crypto.randomBytes(50).toString('hex'), "balance": '0.0', "scratchVerified": true, "emailVerified": false, "strikes": 0, "chargeBacks": 0, "banned": false}
+	let object = {"iconLink":"", "securityQuestion": req.body.question, "apiKey":  crypto.randomBytes(50).toString('hex'), "balance": '0.0', "scratchVerified": true, "securityAnswer": req.body.answer, "strikes": 0, "chargeBacks": 0, "banned": false}
 	
 	getComments('project', '275981545').then(function(e){
 
@@ -748,7 +750,7 @@ function getComments(type, id){
 	return new Promise(function(resolve, reject){
 		let object = {};
 		request(
-			    { uri: "https://scratch.mit.edu/site-api/comments/project/275981545/" },
+			    { uri: "https://scratch.mit.edu/site-api/comments/project/277404510/" },
 			    
 				    function(error, response, body) {
 				       

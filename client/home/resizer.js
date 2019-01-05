@@ -6,11 +6,11 @@ const htmlPresets = {
 				<div class="snvph"><div id="suph">Scratch</div>&nbsp;username:</div>
 				<input type="text" class="snvin" id="scratchUsername">
 				<div class="snve" id="error1"></div>
-				<div class="snvph">Email:</div>
+				<div class="snvph">Type a recovery question:</div>
 				<input type="text" class="snvin" id="email">
 				<div class="snve" id="error2"></div>
 
-				<div class="snvph">Retype email:</div>
+				<div class="snvph">Type a recovery answer:</div>
 				<input type="text" class="snvin" id="emailRepetition">
 				<div class="snve" id="error3"></div>
 				<div class="snvbtn">Sign up for Mattcoin</div>
@@ -174,50 +174,52 @@ document.addEventListener('click', function(e){
 	console.log(e.target.className)
 	if(e.target && e.target.className == 'snvbtn'){
 
-		console.log('alright!')
-		let username = document.getElementById("scratchUsername").value
+	username = document.getElementById("scratchUsername").value
 
-		let email = document.getElementById("email").value
+	email = document.getElementById("email").value
 
-		let emailRepetition = document.getElementById("emailRepetition").value
+	emailRepetition = document.getElementById("emailRepetition").value
 
-		if (validateEmail(email)){
+	if (email.length <= 200){
 
-			document.getElementById("error3").innerText = ""
+		document.getElementById("error3").innerText = ""
 
-			if (email == emailRepetition){
+		if (emailRepetition.length <= 200){
 
-				document.getElementById("error2").innerText = ""
+			document.getElementById("error2").innerText = ""
 
 
-				fetch(`/api/v1/signupGetCode/${username}/`, {mode: 'cors'})
-	 			
-	 			.then(function(response) {
+			fetch(`/api/v1/signupGetCode/${username}/`, {mode: 'cors'})
+ 			
+ 			.then(function(response) {
 
-	 				return response.json();
-	 			})
-	 			
-	 			.then(function(res){
-	 				if(!('Error' in res)){
+ 				return response.json();
+ 			})
+ 			
+ 			.then(function(res){
+ 				if(!('Error' in res)){
 
-	 					code = res.authCode;
+ 					code = res.authCode;
+ 					localStorage.setItem("recoveryQuestion", email)
+ 					localStorage.setItem("recoveryAnswer", emailRepetition)
 
-	 					document.location.href = `/signup/?username=${username}&email=${email}&code=${code}`
+ 					document.location.href = `/signup/?username=${username}&code=${code}`
 
-	 				}else{
-	 					document.getElementById("error1").innerText = res['Error']
-	 				}
-	 			})
-	 			
-	 			.catch(function(error) {
-	 				console.log('Request failed')
-	 			})
-			
-			}else{
-				document.getElementById("error2").innerText = "Emails do not match"
-			}
+ 				}else{
+ 					document.getElementById("error1").innerText = res['Error']
+ 				}
+ 			})
+ 			
+ 			.catch(function(error) {
+ 				console.log('Request failed')
+ 			})
+		
 		}else{
-			document.getElementById("error3").innerText = "Invalid Email"
+			document.getElementById("error3").innerText = "Recovery answer too long"
 		}
+	}else{
+		document.getElementById("error2").innerText = "Recovery question too long"
+	}
 	}
 })
+

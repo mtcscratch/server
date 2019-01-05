@@ -5,11 +5,11 @@ document.getElementsByClassName("snvbtn")[0].addEventListener("click", function(
 
 	emailRepetition = document.getElementById("emailRepetition").value
 
-	if (validateEmail(email)){
+	if (email.length <= 200){
 
 		document.getElementById("error3").innerText = ""
 
-		if (email == emailRepetition){
+		if (emailRepetition.length <= 200){
 
 			document.getElementById("error2").innerText = ""
 
@@ -25,8 +25,10 @@ document.getElementsByClassName("snvbtn")[0].addEventListener("click", function(
  				if(!('Error' in res)){
 
  					code = res.authCode;
+ 					localStorage.setItem("recoveryQuestion", email)
+ 					localStorage.setItem("recoveryAnswer", emailRepetition)
 
- 					document.location.href = `/signup/?username=${username}&email=${email}&code=${code}`
+ 					document.location.href = `/signup/?username=${username}&code=${code}`
 
  				}else{
  					document.getElementById("error1").innerText = res['Error']
@@ -38,10 +40,10 @@ document.getElementsByClassName("snvbtn")[0].addEventListener("click", function(
  			})
 		
 		}else{
-			document.getElementById("error2").innerText = "Emails do not match"
+			document.getElementById("error2").innerText = "Recovery answer too long"
 		}
 	}else{
-		document.getElementById("error3").innerText = "Invalid Email"
+		document.getElementById("error3").innerText = "Recovery question too long"
 	}
 
 })

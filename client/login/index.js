@@ -51,7 +51,7 @@ document.getElementsByClassName("snvbtn")[0].addEventListener("click", function(
 				document.getElementsByClassName('signupNav')[0].parentNode.removeChild(document.getElementsByClassName('signupNav')[0])
 				document.body.innerHTML += `<div class="codeNav">
 										<div class="cnvcode">${code}</div>
-										<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/275981545/" target="_blank">this scratch project</a> to
+										<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/277404510/" target="_blank">this scratch project</a> to
 										verify that ${username} is your scratch account. Autochecking and reseting every 30 seconds.</div>
 										</div>`;
 
@@ -82,7 +82,7 @@ document.getElementsByClassName("snvbtn")[0].addEventListener("click", function(
 
 						document.body.innerHTML += `<div class="codeNav">
 										<div class="cnvcode">${code}</div>
-										<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/275981545/" target="_blank">this scratch project</a> to
+										<div class="cnvph">Type the code above in <a href="https://scratch.mit.edu/projects/277404510/" target="_blank">this scratch project</a> to
 										verify that ${username} is your scratch account. Autochecking and reseting every 30 seconds.</div>
 										</div>`;
 					}
